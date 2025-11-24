@@ -114,7 +114,7 @@ func Take(ptr unsafe.Pointer) *Object {
 		obj.Ref()
 	}
 
-	runtime.SetFinalizer(obj, (*Object).Unref)
+	WrapFinalizer("Object(Take)", obj, (*Object).Unref)
 	return obj
 }
 
@@ -126,7 +126,7 @@ func TransferNone(ptr unsafe.Pointer) *Object { return Take(ptr) }
 // to clear the transferred ref.
 func TransferFull(ptr unsafe.Pointer) *Object {
 	obj := newObject(ToGObject(ptr))
-	runtime.SetFinalizer(obj, (*Object).Unref)
+	WrapFinalizer("Object(TransferFull)", obj, (*Object).Unref)
 	return obj
 }
 
@@ -488,12 +488,15 @@ func wrapObject(ptr unsafe.Pointer) *Object {
 		GObject: ToGObject(ptr),
 	}
 
+	name := ""
 	if obj.IsFloating() {
 		obj.RefSink()
+		name = "Object(RefSink)"
 	} else {
 		obj.Ref()
+		name = "Object(Ref)"
 	}
 
-	runtime.SetFinalizer(obj, (*Object).Unref)
+	WrapFinalizer(name, obj, (*Object).Unref)
 	return obj
 }

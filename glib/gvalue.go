@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"runtime"
 	"sync"
 	"unsafe"
 )
@@ -71,7 +70,7 @@ func ValueAlloc() (*Value, error) {
 	//An allocated GValue is not guaranteed to hold a value that can be unset
 	//We need to double check before unsetting, to prevent:
 	//`g_value_unset: assertion 'G_IS_VALUE (value)' failed`
-	runtime.SetFinalizer(v, func(f *Value) {
+	WrapFinalizer("ValueAlloc", v, func(f *Value) {
 
 		if !f.IsValue() {
 			C.g_free(C.gpointer(f.native()))
@@ -94,7 +93,7 @@ func ValueInit(t Type) (*Value, error) {
 		return nil, errNilPtr
 	}
 	v := &Value{c}
-	runtime.SetFinalizer(v, (*Value).unset)
+	WrapFinalizer("ValueInit", v, (*Value).unset)
 	return v, nil
 }
 
@@ -107,7 +106,7 @@ func ValueFromNative(l unsafe.Pointer) *Value {
 // is placed on the Value afterwards to clear it when it leaves scope.
 func ValueFromNativeOwned(l unsafe.Pointer) *Value {
 	v := &Value{(*C.GValue)(l)}
-	runtime.SetFinalizer(v, (*Value).unset)
+	WrapFinalizer("ValueFromNativeOwned", v, (*Value).unset)
 	return v
 }
 

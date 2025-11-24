@@ -3,7 +3,6 @@ package glib
 // #include "glib.go.h"
 import "C"
 import (
-	"runtime"
 	"unsafe"
 )
 
@@ -25,10 +24,7 @@ func wrapBytes(cbytes *C.GBytes) *Bytes {
 		ptr: cbytes,
 	}
 
-	runtime.SetFinalizer(bytes, func(b *Bytes) {
-		b.Unref()
-	})
-
+	WrapFinalizer("Bytes", bytes, (*Bytes).Unref)
 	return bytes
 }
 

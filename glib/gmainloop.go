@@ -4,7 +4,6 @@ package glib
 #include "glib.go.h"
 */
 import "C"
-import "runtime"
 
 // MainLoop is a go representation of a GMainLoop. It can be used to block execution
 // while a pipeline is running, and also allows for event sources and signals to be used
@@ -31,7 +30,7 @@ func NewMainLoop(ctx *MainContext, isRunning bool) *MainLoop {
 	}
 	loop := C.g_main_loop_new(gCtx, gbool(isRunning))
 	ml := wrapMainLoop(loop)
-	runtime.SetFinalizer(ml, (*MainLoop).Unref)
+	WrapFinalizer("MainLoop", ml, (*MainLoop).Unref)
 	return ml
 }
 

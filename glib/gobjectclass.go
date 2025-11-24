@@ -9,7 +9,6 @@ import "C"
 
 import (
 	"math"
-	"runtime"
 	"unsafe"
 )
 
@@ -51,7 +50,7 @@ func (o *ObjectClass) ListProperties() []*ParamSpec {
 
 	for _, prop := range (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.GParamSpec)(nil))]*C.GParamSpec)(unsafe.Pointer(props))[:size:size] {
 		ps := ToParamSpec(unsafe.Pointer(prop))
-		runtime.SetFinalizer(ps, (*ParamSpec).Unref)
+		WrapFinalizer("ParamSpec", ps, (*ParamSpec).Unref)
 		out = append(out, ps)
 
 	}

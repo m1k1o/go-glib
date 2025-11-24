@@ -11,7 +11,6 @@ package glib
 import "C"
 
 import (
-	"runtime"
 	"unsafe"
 )
 
@@ -52,7 +51,7 @@ func takeVariantType(v *C.GVariantType) *VariantType {
 		return nil
 	}
 	obj := &VariantType{v}
-	runtime.SetFinalizer(obj, (*VariantType).Free)
+	WrapFinalizer("VariantType", obj, (*VariantType).Free)
 	return obj
 }
 

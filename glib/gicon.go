@@ -7,7 +7,6 @@ package glib
 import "C"
 import (
 	"errors"
-	"runtime"
 	"unsafe"
 )
 
@@ -103,7 +102,7 @@ func IconNewForString(str string) (*Icon, error) {
 	}
 	i := &Icon{obj}
 
-	runtime.SetFinalizer(i, func(_ interface{}) { obj.Unref() })
+	WrapFinalizer("Icon", i, (*Icon).Unref)
 	return i, nil
 }
 

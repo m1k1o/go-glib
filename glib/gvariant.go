@@ -9,7 +9,6 @@ import "C"
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 )
 
@@ -81,13 +80,16 @@ func takeVariant(p *C.GVariant) *Variant {
 	}
 	obj := &Variant{GVariant: p}
 
+	name := ""
 	if obj.IsFloating() {
 		obj.RefSink()
+		name = "Variant(RefSink)"
 	} else {
 		obj.Ref()
+		name = "Variant(Ref)"
 	}
 
-	runtime.SetFinalizer(obj, (*Variant).Unref)
+	WrapFinalizer(name, obj, (*Variant).Unref)
 	return obj
 }
 
@@ -221,7 +223,7 @@ func (v *Variant) GetVariant() *Variant {
 	// The returned value is returned with full ownership transfer,
 	// only Unref(), don't Ref().
 	obj := newVariant(c)
-	runtime.SetFinalizer(obj, (*Variant).Unref)
+	WrapFinalizer("Variant(GetVariant)", obj, (*Variant).Unref)
 	return obj
 }
 

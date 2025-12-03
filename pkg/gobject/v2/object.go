@@ -122,6 +122,28 @@ func UnsafeObjectFromGlibFull(p unsafe.Pointer) Object {
 	return obj.cast()
 }
 
+// UnsafeObjectRef increases the reference count of the given Object.
+func UnsafeObjectRef(obj Object) {
+	if obj == nil {
+		return
+	}
+
+	C.g_object_ref(C.gpointer(obj.baseObject().unsafe()))
+}
+
+// UnsafeObjectUnref decreases the reference count of the given Object.
+func UnsafeObjectUnref(obj Object) {
+	if obj == nil {
+		return
+	}
+
+	C.g_object_unref(C.gpointer(obj.baseObject().unsafe()))
+	runtime.SetFinalizer(
+		obj.baseObject().objectInstance,
+		nil,
+	)
+}
+
 // UnsafeObjectToGlibNone is used to convert the Object to C.
 func UnsafeObjectToGlibNone(obj Object) unsafe.Pointer {
 	if obj == nil {
